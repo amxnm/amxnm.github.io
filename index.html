@@ -29,6 +29,7 @@
       border-radius: 20px;
       max-width: 90%;
       z-index: 2;
+      backdrop-filter: blur(6px);
     }
 
     h1 {
@@ -48,6 +49,7 @@
       border-radius: 50px;
       cursor: pointer;
       position: absolute;
+      transition: 0.2s;
     }
 
     #yes {
@@ -78,8 +80,14 @@
     }
 
     @keyframes pop {
-      from { transform: scale(0); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      from {
+        transform: scale(0);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
   </style>
 </head>
@@ -102,55 +110,75 @@
   const yesBtn = document.getElementById("yes");
   const card = document.getElementById("card");
 
-  // Move NO button on hover (works on desktop)
+  // Move NO button
   noBtn.addEventListener("mouseenter", moveNo);
   noBtn.addEventListener("touchstart", moveNo);
 
   function moveNo() {
     const x = Math.random() * (window.innerWidth - 120);
     const y = Math.random() * (window.innerHeight - 60);
+
     noBtn.style.left = x + "px";
     noBtn.style.top = y + "px";
   }
 
   // YES click
   yesBtn.addEventListener("click", () => {
-    card.innerHTML = `<div class="boom">💥💖 YES!!! 💖💥<br><br>You just made my day 😍</div>`;
+    card.innerHTML = `
+      <div class="boom">
+        💥💖 YES!!! 💖💥<br><br>
+        You just made my day 😍
+      </div>
+    `;
     startConfetti();
   });
 
-  // Confetti logic
+  // Confetti setup
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
 
   let pieces = [];
 
   function startConfetti() {
     pieces = [];
+
     for (let i = 0; i < 250; i++) {
       pieces.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
         r: Math.random() * 6 + 3,
         d: Math.random() * 4 + 2,
-        color: `hsl(${Math.random() * 360},100%,70%)`
+        color: `hsl(${Math.random() * 360}, 100%, 70%)`
       });
     }
+
     animate();
   }
 
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     pieces.forEach(p => {
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fillStyle = p.color;
       ctx.fill();
+
       p.y += p.d;
-      if (p.y > canvas.height) p.y = -10;
+
+      if (p.y > canvas.height) {
+        p.y = -10;
+      }
     });
+
     requestAnimationFrame(animate);
   }
 </script>
