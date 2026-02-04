@@ -6,10 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       height: 100vh;
@@ -24,22 +20,16 @@
     }
 
     .card {
-      background: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.2);
       padding: 40px;
       border-radius: 20px;
       max-width: 90%;
       z-index: 2;
-      backdrop-filter: blur(6px);
     }
 
     h1 {
       font-size: 2.3rem;
       margin-bottom: 30px;
-    }
-
-    .buttons {
-      position: relative;
-      height: 120px;
     }
 
     button {
@@ -48,22 +38,19 @@
       border: none;
       border-radius: 50px;
       cursor: pointer;
-      position: absolute;
-      transition: 0.2s;
+      margin: 10px;
+      position: relative;
     }
 
     #yes {
-      background: #ffffff;
+      background: white;
       color: #ff4e8a;
-      left: 50%;
-      transform: translateX(-120%);
     }
 
     #no {
       background: #ff1f6d;
       color: white;
-      left: 50%;
-      transform: translateX(20%);
+      position: absolute;
     }
 
     canvas {
@@ -71,7 +58,6 @@
       top: 0;
       left: 0;
       pointer-events: none;
-      z-index: 1;
     }
 
     .boom {
@@ -80,14 +66,8 @@
     }
 
     @keyframes pop {
-      from {
-        transform: scale(0);
-        opacity: 0;
-      }
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
   </style>
 </head>
@@ -99,86 +79,61 @@
 <div class="card" id="card">
   <h1>Maryam 💕<br>Will you be my Valentine?</h1>
 
-  <div class="buttons">
-    <button id="yes">Yes 💖</button>
-    <button id="no">No 🙃</button>
-  </div>
+  <button id="yes" onclick="yesClicked()">Yes 💖</button>
+  <button id="no" onclick="moveNo()">No 🙃</button>
 </div>
 
 <script>
   const noBtn = document.getElementById("no");
-  const yesBtn = document.getElementById("yes");
   const card = document.getElementById("card");
-
-  // Move NO button
-  noBtn.addEventListener("mouseenter", moveNo);
-  noBtn.addEventListener("touchstart", moveNo);
 
   function moveNo() {
     const x = Math.random() * (window.innerWidth - 120);
     const y = Math.random() * (window.innerHeight - 60);
-
     noBtn.style.left = x + "px";
     noBtn.style.top = y + "px";
   }
 
-  // YES click
-  yesBtn.addEventListener("click", () => {
-    card.innerHTML = `
-      <div class="boom">
-        💥💖 YES!!! 💖💥<br><br>
-        You just made my day 😍
-      </div>
-    `;
+  // Also move NO on hover (desktop)
+  noBtn.addEventListener("mouseenter", moveNo);
+
+  function yesClicked() {
+    card.innerHTML = <div class="boom">💥💖 YES!!! 💖💥<br><br>You just made my day 😍</div>;
     startConfetti();
-  });
-
-  // Confetti setup
-  const canvas = document.getElementById("confetti");
-  const ctx = canvas.getContext("2d");
-
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
   }
 
-  resizeCanvas();
-  window.addEventListener("resize", resizeCanvas);
+  // Confetti
+  const canvas = document.getElementById("confetti");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
-  let pieces = [];
+  let confetti = [];
 
   function startConfetti() {
-    pieces = [];
-
-    for (let i = 0; i < 250; i++) {
-      pieces.push({
+    confetti = [];
+    for (let i = 0; i < 300; i++) {
+      confetti.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
         r: Math.random() * 6 + 3,
         d: Math.random() * 4 + 2,
-        color: `hsl(${Math.random() * 360}, 100%, 70%)`
+        color: hsl(${Math.random() * 360},100%,70%)
       });
     }
-
     animate();
   }
 
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    pieces.forEach(p => {
+    confetti.forEach(c => {
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
+      ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+      ctx.fillStyle = c.color;
       ctx.fill();
-
-      p.y += p.d;
-
-      if (p.y > canvas.height) {
-        p.y = -10;
-      }
+      c.y += c.d;
+      if (c.y > canvas.height) c.y = -10;
     });
-
     requestAnimationFrame(animate);
   }
 </script>
